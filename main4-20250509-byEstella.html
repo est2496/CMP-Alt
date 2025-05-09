@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Order System</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .nav-tabs {
+            display: flex;
+            background: var(--light);
+            border-bottom: 1px solid #ddd;
+        }
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--dark);
+            position: relative;
+        }
+        .tab-btn.active {
+            background: white;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        .tab-btn.active:after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--secondary);
+        }
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #219653;
+        }
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .flex-container {
+            display: flex;
+            gap: 2rem;
+        }
+        .main-content {
+            flex: 3;
+        }
+        .cart-sidebar {
+            flex: 1;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .cart-item-details {
+            flex: 1;
+        }
+        .cart-item-actions {
+            margin-left: 1rem;
+        }
+        .delete-item {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.2rem 0.5rem;
+        }
+        .delete-item:hover {
+            color: #c0392b;
+        }
+        .cart-summary {
+            margin-top: 1.5rem;
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+        }
+        .cart-summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .cart-total, .order-total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            text-align: right;
+        }
+        .empty-cart {
+            color: var(--gray);
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .products-table th, .products-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .products-table th {
+            background-color: var(--light);
+        }
+        .action-btn {
+            padding: 0.5rem 1rem;
+            margin-right: 0.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #admin-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+        #product-form {
+            display: none;
+            margin-bottom: 2rem;
+        }
+        .two-columns {
+            display: flex;
+            gap: 1rem;
+        }
+        .two-columns .form-group {
+            flex: 1;
+        }
+        .cart-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        /* NEW STYLES FOR PRICING TABLES */
+        .pricing-section {
+            margin: 2rem 0;
+        }
+        .pricing-section h2 {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary);
+        }
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .pricing-table th, .pricing-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .pricing-table th {
+            background-color: var(--light);
+            font-weight: 600;
+        }
+        .pricing-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .quantity-control input {
+            width: 60px;
+            text-align: center;
+            padding: 0.5rem;
+        }
+        .environment-selector {
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: var(--light);
+            border-radius: 4px;
+        }
+        /* Admin form specs section */
+        .specs-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+        .specs-section h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .two-columns {
+            flex-wrap: wrap;
+        }
+
+        .two-columns > .form-group {
+            flex: 1;
+        }
+
+        #shipping-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .mysql-specs {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Online Order System</div>
+        <div id="admin-link" style="display: none;">
+            <button class="btn btn-primary" onclick="showTab('admin-tab')">Admin Panel</button>
+        </div>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="showTab('order-tab')">Order Products</button>
+        <button class="tab-btn" onclick="showTab('checkout-tab')">Checkout</button>
+        <button class="tab-btn" id="admin-tab-btn" onclick="showTab('admin-tab')" style="display: none;">Admin Panel</button>
+    </div>
+
+    <div class="container">
+        <!-- ORDER TAB -->
+        <div id="order-tab" class="tab-content active">
+            <h1>Product Catalog</h1>
+            
+            <!-- Server Environment Selector -->
+            <div class="environment-selector">
+                <label for="server-environment">Server Environment:</label>
+                <select id="server-environment">
+                    <option value="dev">Development</option>
+                    <option value="prod">Production</option>
+                    <option value="dr">Disaster Recovery</option>
+                </select>
+            </div>
+
+            <!-- ELASTIC CLOUD SERVERS TABLE -->
+            <div class="pricing-section">
+                <h2>Elastic Cloud Servers</h2>
+                <table class="pricing-table" id="ecs-table">
+                    <thead>
+                        <tr>
+                            <th>vCPUs</th>
+                            <th>Memory</th>
+                            <th>Disk</th>
+                            <th>Data Transfer</th>
+                            <th>Bandwidth</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- ECS rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- STORAGE TABLE -->
+            <div class="pricing-section">
+                <h2>Storage</h2>
+                <table class="pricing-table" id="storage-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Capacity</th>
+                            <th>IOPS</th>
+                            <th>Throughput</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Storage rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- MANAGED SERVICES TABLE -->
+            <div class="pricing-section">
+                <h2>Managed Services</h2>
+                <table class="pricing-table" id="managed-table">
+                    <thead>
+                        <tr>
+                            <th>Service Level</th>
+                            <th>Coverage</th>
+                            <th>Response Time</th>
+                            <th>Support Channels</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Managed services rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- MYSQL RDS DATABASE SERVICE TABLE -->
+            <div class="pricing-section">
+                <h2>MySQL RDS Database Service</h2>
+                <table class="pricing-table" id="mysql-table">
+                    <thead>
+                        <tr>
+                            <th>Edition</th>
+                            <th>vCPUs</th>
+                            <th>RAM</th>
+                            <th>Storage</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- MySQL rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="flex-container">
+                <main class="main-content">
+                    <!-- Content area remains empty since we're using tables -->
+                </main>
+                
+                <aside class="cart-sidebar">
+                    <h2>Shopping Cart</h2>
+                    <div id="cart-items">
+                        <div class="empty-cart">Your cart is empty</div>
+                    </div>
+                    <div id="cart-summary" class="cart-summary" style="display: none;">
+                        <div class="cart-summary-row">
+                            <span>Subtotal:</span>
+                            <span id="cart-subtotal">RM0.00</span>
+                        </div>
+                        <div class="cart-summary-row">
+                            <span>Tax (8%):</span>
+                            <span id="cart-tax">0.00</span>
+                        </div>
+                        <div class="cart-total">
+                            <span>Total:</span>
+                            <span id="cart-total">RM0.00</span>
+                        </div>
+                    </div>
+                    <div class="cart-actions" id="cart-actions" style="display: none;">
+                        <button class="btn btn-danger" id="clear-cart" style="flex: 1;">Clear Cart</button>
+                        <button class="btn btn-success" id="checkout-btn" style="flex: 2;" onclick="showTab('checkout-tab')">
+                            Proceed to Checkout
+                        </button>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <!-- CHECKOUT TAB -->
+        <div id="checkout-tab" class="tab-content">
+            <h1>Checkout</h1>
+            
+            <div class="flex-container">
+                <div class="main-content">
+                    <h2>Shipping Information</h2>
+                    <form id="shipping-form">
+                        <div class="form-group">
+                            <label for="full-name">Full Name</label>
+                            <input type="text" id="full-name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Shipping Address</label>
+                            <input type="text" id="address" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" required>
+                        </div>
+                        
+                        <div class="two-columns">
+                            <div class="form-group">
+                                <label for="state">State</label>
+                                <select id="state" required>
+                                    <option value="">Select State</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="zip">ZIP/Postal Code</label>
+                                <input type="text" id="zip" required>
+                            </div>
+                        </div> 
+                        
+                        <h2>Payment Method</h2>
+                        
+                        <div class="form-group">
+                            <label for="card-name">Name on Card</label>
+                            <input type="text" id="card-name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="card-number">Card Number</label>
+                            <input type="text" id="card-number" required>
+                        </div>
+                        
+                        <div class="two-columns">
+                            <div class="form-group">
+                                <label for="expiry">Expiry Date</label>
+                                <input type="text" id="expiry" placeholder="MM/YY" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="text" id="cvv" required>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-success" id="place-order" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                            Place Order
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="cart-sidebar">
+                    <h2>Order Summary</h2>
+                    <div id="order-items">
+                        <!-- Order items will be loaded here -->
+                    </div>
+                    <div class="cart-summary">
+                        <div class="cart-summary-row">
+                            <span>Subtotal:</span>
+                            <span id="order-subtotal">RM0.00</span>
+                        </div>
+                        <div class="cart-summary-row">
+                            <span>Tax (8%):</span>
+                            <span id="order-tax">RM0.00</span>
+                        </div>
+                        <div class="order-total">
+                            <span>Total:</span>
+                            <span id="order-total">RM0.00</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="showTab('order-tab')" style="width: 100%;">
+                        ← Back to Shopping
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN TAB -->
+        <div id="admin-tab" class="tab-content">
+            <div id="admin-actions">
+                <h1>Product Catalog Management</h1>
+                <button class="btn btn-primary" id="add-product-btn">Add New Product</button>
+            </div>
+            
+            <div id="product-form">
+                <h2 id="form-title">Add Product</h2>
+                <form>
+                    <input type="hidden" id="product-id">
+                    <div class="form-group">
+                        <label for="admin-product-name">Product Name</label>
+                        <input type="text" id="admin-product-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-product-category">Category</label>
+                        <select id="admin-product-category" required onchange="updateSpecsForm()">
+                            <option value="">Select Category</option>
+                            <option value="ecs">Elastic Cloud Servers</option>
+                            <option value="storage">Storage</option>
+                            <option value="managed">Managed Services</option>
+                            <option value="mysql">MySQL RDS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-product-price">Price (RM)</label>
+                        <input type="number" id="admin-product-price" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-product-description">Description</label>
+                        <input type="text" id="admin-product-description">
+                    </div>
+                    
+                    <!-- Product Specifications Section -->
+                    <div class="specs-section" id="specs-section" style="display: none;">
+                        <h3>Product Specifications</h3>
+                        <div id="ecs-specs" style="display: none;">
+                            <div class="two-columns">
+                                <div class="form-group">
+                                    <label for="ecs-vcpus">vCPUs</label>
+                                    <input type="number" id="ecs-vcpus" min="1" value="1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ecs-memory">Memory (GB)</label>
+                                    <input type="number" id="ecs-memory" step="0.1" min="0.5" value="0.5">
+                                </div>
+                            </div>
+                            <div class="two-columns">
+                                <div class="form-group">
+                                    <label for="ecs-disk">Disk (GB)</label>
+                                    <input type="number" id="ecs-disk" min="1" value="40">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ecs-transfer">Data Transfer (TB)</label>
+                                    <input type="number" id="ecs-transfer" min="0" value="1">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="ecs-bandwidth">Bandwidth (Mbps)</label>
+                                <input type="number" id="ecs-bandwidth" min="1" value="30">
+                            </div>
+                        </div>
+                        
+                        <div id="storage-specs" style="display: none;">
+                            <div class="form-group">
+                                <label for="storage-type">Storage Type</label>
+                                <select id="storage-type">
+                                    <option value="block">Block Storage</option>
+                                    <option value="object">Object Storage</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="storage-capacity">Capacity (GB)</label>
+                                <input type="number" id="storage-capacity" min="1" value="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="storage-iops">IOPS</label>
+                                <input type="number" id="storage-iops" min="0" value="5000">
+                            </div>
+                            <div class="form-group">
+                                <label for="storage-throughput">Throughput (MB/s)</label>
+                                <input type="number" id="storage-throughput" min="1" value="150">
+                            </div>
+                        </div>
+                        
+                        <div id="managed-specs" style="display: none;">
+                            <div class="form-group">
+                                <label for="managed-level">Service Level</label>
+                                <select id="managed-level">
+                                    <option value="basic">Basic</option>
+                                    <option value="premium">Premium</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="managed-coverage">Coverage</label>
+                                <input type="text" id="managed-coverage" value="Business Hours">
+                            </div>
+                            <div class="form-group">
+                                <label for="managed-response">Response Time</label>
+                                <input type="text" id="managed-response" value="4 Hours">
+                            </div>
+                            <div class="form-group">
+                                <label for="managed-channels">Support Channels</label>
+                                <input type="text" id="managed-channels" value="Email/Ticket">
+                            </div>
+                        </div>
+
+                        <div id="mysql-specs" class="specs-section mysql-specs" style="display: none;">
+                            <div class="two-columns">
+                                <div class="form-group">
+                                    <label for="mysql-vcpus">vCPUs</label>
+                                    <input type="number" id="mysql-vcpus" min="1" value="2">
+                                </div>
+                                <div class="form-group">
+                                    <label for="mysql-ram">RAM (GB)</label>
+                                    <input type="number" id="mysql-ram" min="1" value="3">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="mysql-storage">Storage (GB)</label>
+                                <input type="number" id="mysql-storage" min="1" value="500">
+                            </div>
+                            <div class="form-group">
+                                <label for="mysql-edition">Edition</label>
+                                <input type="text" id="mysql-edition" value="HA Edition">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="button" class="btn btn-primary" id="save-product">Save</button>
+                        <button type="button" class="btn btn-danger" id="cancel-edit">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="products-list">
+                    <!-- Products will be loaded here -->
+                </tbody>
+            </table>
+            
+            <button class="btn btn-primary" onclick="showTab('order-tab')" style="margin-top: 2rem;">
+                ← Back to Store
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ========== GLOBAL VARIABLES ==========
+        let products = [
+            // Elastic Cloud Servers
+            { 
+                id: 'ecs-1', 
+                name: "ECS: 2 vCPU / 0.5GB RAM / 40GB ESSD", 
+                category: "ecs", 
+                price: 3.5, 
+                description: "Basic cloud server with 2 vCPUs, 0.5GB memory and 40GB ESSD storage",
+                specs: {
+                    vcpus: 2,
+                    memory: 0.5,
+                    disk: 40,
+                    transfer: 1,
+                    bandwidth: 30
+                }
+            },
+            { 
+                id: 'ecs-2', 
+                name: "ECS: 2 vCPU / 1GB RAM / 50GB ESSD", 
+                category: "ecs", 
+                price: 4.5, 
+                description: "Cloud server with 2 vCPUs, 1GB memory and 50GB ESSD storage",
+                specs: {
+                    vcpus: 2,
+                    memory: 1,
+                    disk: 50,
+                    transfer: 2,
+                    bandwidth: 30
+                }
+            },
+            { 
+                id: 'ecs-3', 
+                name: "ECS: 2 vCPU / 2GB RAM / 60GB ESSD", 
+                category: "ecs", 
+                price: 9, 
+                description: "Cloud server with 2 vCPUs, 2GB memory and 60GB ESSD storage",
+                specs: {
+                    vcpus: 2,
+                    memory: 2,
+                    disk: 60,
+                    transfer: 3,
+                    bandwidth: 30
+                }
+            },
+            { 
+                id: 'ecs-4', 
+                name: "ECS: 2 vCPU / 4GB RAM / 100GB ESSD", 
+                category: "ecs", 
+                price: 19, 
+                description: "Cloud server with 2 vCPUs, 4GB memory and 100GB ESSD storage",
+                specs: {
+                    vcpus: 2,
+                    memory: 4,
+                    disk: 100,
+                    transfer: 4,
+                    bandwidth: 30
+                }
+            },
+            { 
+                id: 'ecs-5', 
+                name: "ECS: 4 vCPU / 16GB RAM / 400GB ESSD", 
+                category: "ecs", 
+                price: 70, 
+                description: "High performance cloud server with 4 vCPUs, 16GB memory and 400GB ESSD storage",
+                specs: {
+                    vcpus: 4,
+                    memory: 16,
+                    disk: 400,
+                    transfer: 6,
+                    bandwidth: 30
+                }
+            },
+            
+            // Storage
+            { 
+                id: 'storage-1', 
+                name: "Block Storage (Standard) 100GB", 
+                category: "storage", 
+                price: 2.79, 
+                description: "100GB Block Storage (Standard Disk) with 5,000 IOPS",
+                specs: {
+                    type: "block",
+                    capacity: 100,
+                    iops: 5000,
+                    throughput: 150
+                }
+            },
+            { 
+                id: 'storage-2', 
+                name: "Object Storage 100GB", 
+                category: "storage", 
+                price: 0.80, 
+                description: "100GB Object Storage with 100MB/s throughput",
+                specs: {
+                    type: "object",
+                    capacity: 100,
+                    iops: null,
+                    throughput: 100
+                }
+            },
+            
+            // Managed Services
+            { 
+                id: 'managed-1', 
+                name: "Basic Managed Service", 
+                category: "managed", 
+                price: 13.28, 
+                description: "Basic managed services for 1 unit of virtual or physical server",
+                specs: {
+                    level: "basic",
+                    coverage: "Business Hours",
+                    response: "4 Hours",
+                    channels: "Email/Ticket"
+                }
+            },
+            { 
+                id: 'managed-2', 
+                name: "Premium Managed Service", 
+                category: "managed", 
+                price: 56.25, 
+                description: "Premium managed services for 1 unit of virtual or physical server",
+                specs: {
+                    level: "premium",
+                    coverage: "24/7",
+                    response: "1 Hour",
+                    channels: "Phone/Email/Chat"
+                }
+            },
+
+            // MySQL RDS Products
+            { 
+                id: 'mysql-1', 
+                name: "Basic MySQL HA Edition RDS", 
+                category: "mysql", 
+                price: 12885.00, 
+                description: "Basic MySQL HA Edition RDS with 2vCPU, 3GB RAM, 500GB SSD Storage",
+                specs: {
+                    vcpus: 2,
+                    ram: 3,
+                    storage: 500,
+                    edition: "HA Edition"
+                }
+            },
+            { 
+                id: 'mysql-2', 
+                name: "Standard MySQL HA Edition RDS", 
+                category: "mysql", 
+                price: 18045.00, 
+                description: "Standard MySQL HA Edition RDS with 4 vCPU, 16GB RAM, 500GB SSD Storage",
+                specs: {
+                    vcpus: 4,
+                    ram: 16,
+                    storage: 500,
+                    edition: "HA Edition"
+                }
+            },
+            { 
+                id: 'mysql-3', 
+                name: "Premium MySQL HA Edition RDS", 
+                category: "mysql", 
+                price: 28459.00, 
+                description: "Premium MySQL HA Edition RDS with 8 vCPU, 32GB RAM, 500GB SSD Storage",
+                specs: {
+                    vcpus: 8,
+                    ram: 32,
+                    storage: 500,
+                    edition: "HA Edition"
+                }
+            },
+            { 
+                id: 'mysql-4', 
+                name: "Advance MySQL HA Edition RDS", 
+                category: "mysql", 
+                price: 58612.00, 
+                description: "Advance MySQL HA Edition RDS with 16 vCPU, 64GB RAM, 500GB SSD Storage",
+                specs: {
+                    vcpus: 16,
+                    ram: 64,
+                    storage: 500,
+                    edition: "HA Edition"
+                }
+            }
+        ];
+        
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const TAX_RATE = 0.08;
+
+        // Malaysian states list
+        const malaysianStates = [
+            "Johor",
+            "Kedah",
+            "Kelantan",
+            "Kuala Lumpur",
+            "Labuan",
+            "Melaka",
+            "Negeri Sembilan",
+            "Pahang",
+            "Penang",
+            "Perak",
+            "Perlis",
+            "Putrajaya",
+            "Sabah",
+            "Sarawak",
+            "Selangor",
+            "Terengganu"
+        ];
+
+        // ========== HELPER FUNCTIONS ==========
+        function loadProductsFromStorage() {
+        // Try to load from localStorage first
+        const storedProducts = localStorage.getItem('products');
+    
+        if (storedProducts) {
+            try {
+                const parsedProducts = JSON.parse(storedProducts);
+                // Only use stored products if they're valid and not empty
+                if (Array.isArray(parsedProducts) && parsedProducts.length > 0) {
+                    products = parsedProducts;
+                } else {
+                    // If stored products are invalid, use defaults and save them
+                    localStorage.setItem('products', JSON.stringify(products));
+                }
+            } catch (e) {
+                // If parsing fails, use defaults and save them
+                localStorage.setItem('products', JSON.stringify(products));
+            }
+        } else {
+            // If no stored products, use defaults and save them
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+    
+        // Always render the products (whether they came from localStorage or defaults)
+        renderPricingTables();
+        }
+
+        function populateStatesDropdown() {
+            const stateSelect = document.getElementById('state');
+            // Clear existing options except the first one
+            while (stateSelect.options.length > 1) {
+                stateSelect.remove(1);
+            }
+            // Add Malaysian states
+            malaysianStates.forEach(state => {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = state;
+                stateSelect.appendChild(option);
+            });
+        }      
+
+        // ========== RENDER PRICING TABLES ==========
+        function renderPricingTables() {
+            renderECSTable();
+            renderStorageTable();
+            renderManagedServicesTable();
+            renderMySQLTable();
+        }
+
+        function renderECSTable() {
+            const ecsProducts = products.filter(p => p.category === 'ecs');
+            const tbody = document.querySelector('#ecs-table tbody');
+            tbody.innerHTML = '';
+    
+            ecsProducts.forEach((product) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${product.specs.vcpus}</td>
+                    <td>${product.specs.memory}GB</td>
+                    <td>${product.specs.disk}GB ESSD</td>
+                    <td>${product.specs.transfer}TB</td>
+                    <td>${product.specs.bandwidth}Mbps</td>
+                    <td>RM${product.price.toFixed(2)}/month</td>
+                    <td>
+                        <div class="quantity-control">
+                            <input type="number" min="1" value="1" id="qty-${product.id}">
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" 
+                        onclick="addProductToCart('${product.id}')">
+                        Add to Cart
+                    </button>
+                </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderStorageTable() {
+            const storageProducts = products.filter(p => p.category === 'storage');
+            const tbody = document.querySelector('#storage-table tbody');
+            tbody.innerHTML = '';
+    
+            storageProducts.forEach((product) => {
+                const typeName = product.specs.type === 'block' ? 'Block Storage (Standard)' : 'Object Storage';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${typeName}</td>
+                    <td>${product.specs.capacity}GB</td>
+                    <td>${product.specs.iops || 'N/A'}</td>
+                    <td>${product.specs.throughput}MB/s</td>
+                    <td>RM${product.price.toFixed(2)}/month</td>
+                    <td>
+                        <div class="quantity-control">
+                            <input type="number" min="1" value="1" id="qty-${product.id}">
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" 
+                            onclick="addProductToCart('${product.id}')">
+                                Add to Cart
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderManagedServicesTable() {
+            const managedProducts = products.filter(p => p.category === 'managed');
+            const tbody = document.querySelector('#managed-table tbody');
+            tbody.innerHTML = '';
+    
+            managedProducts.forEach((product) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${product.specs.level.charAt(0).toUpperCase() + product.specs.level.slice(1)}</td>
+                    <td>${product.specs.coverage}</td>
+                    <td>${product.specs.response}</td>
+                    <td>${product.specs.channels}</td>
+                    <td>RM${product.price.toFixed(2)}/month</td>
+                    <td>
+                        <div class="quantity-control">
+                            <input type="number" min="1" value="1" id="qty-${product.id}">
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" 
+                            onclick="addProductToCart('${product.id}')">
+                            Add to Cart
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderMySQLTable() {
+            const mysqlProducts = products.filter(p => p.category === 'mysql');
+            const tbody = document.querySelector('#mysql-table tbody');
+            tbody.innerHTML = '';
+    
+            mysqlProducts.forEach((product) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${product.specs.edition}</td>
+                    <td>${product.specs.vcpus}</td>
+                    <td>${product.specs.ram}GB</td>
+                    <td>${product.specs.storage}GB SSD</td>
+                    <td>RM${product.price.toFixed(2)}/year</td>
+                    <td>
+                        <div class="quantity-control">
+                            <input type="number" min="1" value="1" id="qty-${product.id}">
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" 
+                            onclick="addProductToCart('${product.id}')">
+                            Add to Cart
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ========== TAB NAVIGATION ==========
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
+            
+            if (tabId === 'order-tab') {
+                loadCart();
+                renderPricingTables();
+            }
+            else if (tabId === 'checkout-tab') loadOrderSummary();
+            else if (tabId === 'admin-tab') renderProducts();
+        }
+
+        // ========== CART FUNCTIONS ==========
+        function addProductToCart(productId) {
+            const environment = document.getElementById('server-environment').value;
+            const envName = environment === 'dev' ? 'Dev' : 
+                        environment === 'prod' ? 'Prod' : 'DR';
+    
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+    
+            // Updated to use the new quantity input ID format
+            const quantity = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
+            const existingItem = cart.find(item => item.id === `${productId}-${environment}`);
+            
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({
+                    id: `${productId}-${environment}`,
+                    name: `${product.name} (${envName})`,
+                    price: product.price,
+                    quantity: quantity,
+                    environment: environment
+                });
+            }
+            
+            saveCart();
+            loadCart();
+            alert(`${quantity} × ${product.name} (${envName}) added to cart!`);
+        }
+
+        function removeFromCart(index) {
+            if (confirm('Are you sure you want to remove this item from your cart?')) {
+                cart.splice(index, 1);
+                saveCart();
+                loadCart();
+            }
+        }
+
+        function clearCart() {
+            if (confirm('Are you sure you want to clear your cart?')) {
+                cart = [];
+                saveCart();
+                loadCart();
+            }
+        }
+
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        function loadCart() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartSummaryContainer = document.getElementById('cart-summary');
+            const cartActionsContainer = document.getElementById('cart-actions');
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
+                cartSummaryContainer.style.display = 'none';
+                cartActionsContainer.style.display = 'none';
+                return;
+            }
+            
+            cartItemsContainer.innerHTML = '';
+            let subtotal = 0;
+            
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-details">
+                        <div><strong>${item.name}</strong></div>
+                        <div>Quantity: ${item.quantity}</div>
+                        <div>Price: RM${item.price.toFixed(2)} each</div>
+                        <div><strong>Subtotal: RM${itemTotal.toFixed(2)}</strong></div>
+                    </div>
+                    <div class="cart-item-actions">
+                        <button class="delete-item" onclick="removeFromCart(${index})">×</button>
+                    </div>
+                `;
+                cartItemsContainer.appendChild(cartItem);
+            });
+            
+            const tax = subtotal * TAX_RATE;
+            const total = subtotal + tax;
+            
+            document.getElementById('cart-subtotal').textContent = `RM${subtotal.toFixed(2)}`;
+            document.getElementById('cart-tax').textContent = `RM${tax.toFixed(2)}`;
+            document.getElementById('cart-total').textContent = `RM${total.toFixed(2)}`;
+            
+            cartSummaryContainer.style.display = 'block';
+            cartActionsContainer.style.display = 'flex';
+        }
+
+        // ========== CHECKOUT FUNCTIONS ==========
+        function loadOrderSummary() {
+            const orderItemsContainer = document.getElementById('order-items');
+            
+            orderItemsContainer.innerHTML = '';
+            
+            if (cart.length === 0) {
+                orderItemsContainer.innerHTML = '<p>No items in cart</p>';
+                document.getElementById('order-subtotal').textContent = 'RM0.00';
+                document.getElementById('order-tax').textContent = 'RM0.00';
+                document.getElementById('order-total').textContent = 'RM0.00';
+                return;
+            }
+            
+            let subtotal = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                
+                const orderItem = document.createElement('div');
+                orderItem.className = 'order-item';
+                orderItem.innerHTML = `
+                    <div>${item.name} (${item.quantity})</div>
+                    <div>RM${itemTotal.toFixed(2)}</div>
+                `;
+                orderItemsContainer.appendChild(orderItem);
+            });
+            
+            const tax = subtotal * TAX_RATE;
+            const total = subtotal + tax;
+            
+            document.getElementById('order-subtotal').textContent = `RM${subtotal.toFixed(2)}`;
+            document.getElementById('order-tax').textContent = `RM${tax.toFixed(2)}`;
+            document.getElementById('order-total').textContent = `RM${total.toFixed(2)}`;
+        }
+
+        function validateForm() {
+            const requiredFields = ['full-name', 'email', 'address', 'city', 'state', 'zip', 'card-name', 'card-number', 'expiry', 'cvv'];
+            
+            for (const fieldId of requiredFields) {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    alert(`Please fill in ${field.labels[0].textContent}`);
+                    field.focus();
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // ========== ADMIN FUNCTIONS ==========
+        function updateSpecsForm() {
+            const category = document.getElementById('admin-product-category').value;
+            const specsSection = document.getElementById('specs-section');
+            const ecsSpecs = document.getElementById('ecs-specs');
+            const storageSpecs = document.getElementById('storage-specs');
+            const managedSpecs = document.getElementById('managed-specs');
+            const mysqlSpecs = document.getElementById('mysql-specs');
+            
+            // Hide all specs sections first
+            specsSection.style.display = 'none';
+            ecsSpecs.style.display = 'none';
+            storageSpecs.style.display = 'none';
+            managedSpecs.style.display = 'none';
+            mysqlSpecs.style.display = 'none';
+            
+            if (category === 'ecs') {
+                specsSection.style.display = 'block';
+                ecsSpecs.style.display = 'block';
+            } else if (category === 'storage') {
+                specsSection.style.display = 'block';
+                storageSpecs.style.display = 'block';
+            } else if (category === 'managed') {
+                specsSection.style.display = 'block';
+                managedSpecs.style.display = 'block';
+            } else if (category === 'mysql') {
+                specsSection.style.display = 'block';
+                mysqlSpecs.style.display = 'block';
+            }
+        }
+
+        function renderProducts() {
+            const productsList = document.getElementById('products-list');
+            productsList.innerHTML = '';
+            
+            products.forEach(product => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.category}</td>
+                    <td>RM${product.price.toFixed(2)}</td>
+                    <td>
+                        <button class="action-btn" style="background: #3498db; color: white;" onclick="editProduct('${product.id}')">Edit</button>
+                        <button class="action-btn" style="background: #e74c3c; color: white;" onclick="deleteProduct('${product.id}')">Delete</button>
+                    </td>
+                `;
+                productsList.appendChild(tr);
+            });
+        }
+
+        function showAddForm() {
+            document.getElementById('form-title').textContent = 'Add Product';
+            document.getElementById('product-form').style.display = 'block';
+            document.getElementById('product-id').value = '';
+            document.getElementById('admin-product-name').value = '';
+            document.getElementById('admin-product-category').value = '';
+            document.getElementById('admin-product-price').value = '';
+            document.getElementById('admin-product-description').value = '';
+            
+            // Hide specs section initially
+            document.getElementById('specs-section').style.display = 'none';
+        }
+        
+        function editProduct(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+            
+            document.getElementById('form-title').textContent = 'Edit Product';
+            document.getElementById('product-id').value = product.id;
+            document.getElementById('admin-product-name').value = product.name;
+            document.getElementById('admin-product-category').value = product.category;
+            document.getElementById('admin-product-price').value = product.price;
+            document.getElementById('admin-product-description').value = product.description || '';
+            
+            // Update specs fields based on category
+            if (product.category === 'ecs') {
+                document.getElementById('ecs-vcpus').value = product.specs.vcpus;
+                document.getElementById('ecs-memory').value = product.specs.memory;
+                document.getElementById('ecs-disk').value = product.specs.disk;
+                document.getElementById('ecs-transfer').value = product.specs.transfer;
+                document.getElementById('ecs-bandwidth').value = product.specs.bandwidth;
+            } else if (product.category === 'storage') {
+                document.getElementById('storage-type').value = product.specs.type;
+                document.getElementById('storage-capacity').value = product.specs.capacity;
+                document.getElementById('storage-iops').value = product.specs.iops || '';
+                document.getElementById('storage-throughput').value = product.specs.throughput;
+            } else if (product.category === 'managed') {
+                document.getElementById('managed-level').value = product.specs.level;
+                document.getElementById('managed-coverage').value = product.specs.coverage;
+                document.getElementById('managed-response').value = product.specs.response;
+                document.getElementById('managed-channels').value = product.specs.channels;
+            } else if (product.category === 'mysql') {
+                document.getElementById('mysql-vcpus').value = product.specs.vcpus;
+                document.getElementById('mysql-ram').value = product.specs.ram;
+                document.getElementById('mysql-storage').value = product.specs.storage;
+                document.getElementById('mysql-edition').value = product.specs.edition;
+            }
+            
+            // Show the appropriate specs section
+            updateSpecsForm();
+            document.getElementById('product-form').style.display = 'block';
+        }
+        
+        function saveProduct() {
+            const id = document.getElementById('product-id').value || 
+                      `${document.getElementById('admin-product-category').value.toLowerCase()}-${products.length + 1}`;
+                
+            const name = document.getElementById('admin-product-name').value;
+            const category = document.getElementById('admin-product-category').value;
+            const price = parseFloat(document.getElementById('admin-product-price').value);
+            const description = document.getElementById('admin-product-description').value;
+            
+            if (!name || !category || isNaN(price)) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Get specs based on category
+            let specs = {};
+            if (category === 'ecs') {
+                specs = {
+                    vcpus: parseInt(document.getElementById('ecs-vcpus').value),
+                    memory: parseFloat(document.getElementById('ecs-memory').value),
+                    disk: parseInt(document.getElementById('ecs-disk').value),
+                    transfer: parseInt(document.getElementById('ecs-transfer').value),
+                    bandwidth: parseInt(document.getElementById('ecs-bandwidth').value)
+                };
+            } else if (category === 'storage') {
+                specs = {
+                    type: document.getElementById('storage-type').value,
+                    capacity: parseInt(document.getElementById('storage-capacity').value),
+                    iops: parseInt(document.getElementById('storage-iops').value) || null,
+                    throughput: parseInt(document.getElementById('storage-throughput').value)
+                };
+            } else if (category === 'managed') {
+                specs = {
+                    level: document.getElementById('managed-level').value,
+                    coverage: document.getElementById('managed-coverage').value,
+                    response: document.getElementById('managed-response').value,
+                    channels: document.getElementById('managed-channels').value
+                };
+            } else if (category === 'mysql') {
+                specs = {
+                    vcpus: parseInt(document.getElementById('mysql-vcpus').value),
+                    ram: parseInt(document.getElementById('mysql-ram').value),
+                    storage: parseInt(document.getElementById('mysql-storage').value),
+                    edition: document.getElementById('mysql-edition').value
+                };
+            }
+            
+            const product = { id, name, category, price, description, specs };
+            
+            if (document.getElementById('product-id').value) {
+                // Update existing product
+                const index = products.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    products[index] = product;
+                }
+            } else {
+                // Add new product
+                products.push(product);
+            }
+            
+            localStorage.setItem('products', JSON.stringify(products));
+            renderProducts();
+            hideForm();
+            renderPricingTables();  
+        }
+        
+        function deleteProduct(id) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('products', JSON.stringify(products));
+                renderProducts();
+                renderPricingTables(); 
+            }
+        }
+        
+        function hideForm() {
+            document.getElementById('product-form').style.display = 'none';
+        }
+
+        // ========== INITIALIZE ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. First ensure products are loaded (with fallback to defaults)
+            loadProductsFromStorage();
+    
+            // 2. Initialize cart after products are loaded
+            initializeCart();
+    
+            // 3. Load UI components that depend on products and cart
+            initializeUI();
+    
+            // 4. Set up event listeners
+            setupEventListeners();
+    
+            // Demo: Enable admin access by default (remove in production)
+            toggleAdminAccess(true);
+            });
+
+            // Helper function to properly initialize cart
+            function initializeCart() {
+                try {
+                    const storedCart = localStorage.getItem('cart');
+                    cart = storedCart ? JSON.parse(storedCart) : [];
+        
+                    // Validate cart items against existing products
+                    cart = cart.filter(item => products.some(p => p.id === item.id.split('-')[0]));
+                    saveCart(); // Save filtered cart back to storage
+                } catch (e) {
+                    console.error('Error loading cart:', e);
+                    cart = [];
+                }
+            }
+
+            // Helper function to initialize UI components
+            function initializeUI() {
+                loadCart();
+                renderPricingTables();
+                populateStatesDropdown();
+    
+                // Show order tab by default
+                showTab('order-tab'); 
+            }
+
+            // Helper function for all event listeners
+            function setupEventListeners() {
+                // Order page
+                document.getElementById('clear-cart').addEventListener('click', clearCart);
+    
+                // Checkout page
+                document.getElementById('place-order').addEventListener('click', function() {
+                    if (validateForm()) {
+                        alert('Thank you for your order!');
+                        cart = [];
+                        saveCart();
+                        showTab('order-tab');
+                    }
+                });
+    
+                // Admin page
+                document.getElementById('add-product-btn').addEventListener('click', showAddForm);
+                document.getElementById('save-product').addEventListener('click', saveProduct);
+                document.getElementById('cancel-edit').addEventListener('click', hideForm);
+            }
+
+            function toggleAdminAccess(show) {
+                document.getElementById('admin-link').style.display = show ? 'block' : 'none';
+                document.getElementById('admin-tab-btn').style.display = show ? 'block' : 'none';
+            }
+    </script>
+</body>
+</html>
