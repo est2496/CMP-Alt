@@ -1,8 +1,8 @@
 <!-- 
   Original Author: Calvin
   Edited by: Estella
-  Modified Date: 2025-05-09
-  Description: This is the alternate main HTML page for the website of CMP service catalog
+  Modified Date: 2025-05-14
+  Description: This is the main HTML page version 2 for the website of CMP service catalog
 -->
 
 <!DOCTYPE html>
@@ -228,6 +228,13 @@
             gap: 1rem;
             margin-top: 1rem;
         }
+        /* Add environment selector styles */
+        .environment-selector {
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: var(--light);
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -249,6 +256,16 @@
         <div id="order-tab" class="tab-content active">
             <h1>Product Catalog</h1>
             
+            <!-- Server Environment Selector -->
+            <div class="environment-selector" style="width: 800px;">
+                <label for="server-environment">Server Environment:</label>
+                <select id="server-environment" style="width: 100%;">
+                    <option value="dev">Development</option>
+                    <option value="prod">Production</option>
+                    <option value="dr">Disaster Recovery</option>
+                </select>
+            </div>
+
             <div class="flex-container">
                 <main class="main-content">
                     <div class="product-form">
@@ -257,6 +274,7 @@
                             <select id="product-category">
                                 <option value="">All Categories</option>
                                 <option value="ecs">Elastic Cloud Servers</option>
+                                <option value="evs">EVS Ultra Disk Space</option>
                                 <option value="storage">Storage</option>
                                 <option value="ManagedServices">Managed Services</option>
                                 <option value="mysql">MySQL RDS Database Service</option>
@@ -277,7 +295,7 @@
                         
                         <div class="form-group">
                             <label>Price</label>
-                            <div id="product-price" style="padding: 0.75rem; background: #f8f9fa; border-radius: 4px;">$0.00</div>
+                            <div id="product-price" style="padding: 0.75rem; background: #f8f9fa; border-radius: 4px;">RM0.00</div>
                         </div>
                         
                         <button class="btn btn-primary" id="add-to-cart">Add to Cart</button>
@@ -292,15 +310,15 @@
                     <div id="cart-summary" class="cart-summary" style="display: none;">
                         <div class="cart-summary-row">
                             <span>Subtotal:</span>
-                            <span id="cart-subtotal">$0.00</span>
+                            <span id="cart-subtotal">RM0.00</span>
                         </div>
                         <div class="cart-summary-row">
                             <span>Tax (8%):</span>
-                            <span id="cart-tax">$0.00</span>
+                            <span id="cart-tax">RM0.00</span>
                         </div>
                         <div class="cart-total">
                             <span>Total:</span>
-                            <span id="cart-total">$0.00</span>
+                            <span id="cart-total">RM0.00</span>
                         </div>
                     </div>
                     <div class="cart-actions" id="cart-actions" style="display: none;">
@@ -389,15 +407,15 @@
                     <div class="cart-summary">
                         <div class="cart-summary-row">
                             <span>Subtotal:</span>
-                            <span id="order-subtotal">$0.00</span>
+                            <span id="order-subtotal">RM0.00</span>
                         </div>
                         <div class="cart-summary-row">
                             <span>Tax (8%):</span>
-                            <span id="order-tax">$0.00</span>
+                            <span id="order-tax">RM0.00</span>
                         </div>
                         <div class="order-total">
                             <span>Total:</span>
-                            <span id="order-total">$0.00</span>
+                            <span id="order-total">RM0.00</span>
                         </div>
                     </div>
                     <button class="btn btn-primary" onclick="showTab('order-tab')" style="width: 100%;">
@@ -427,18 +445,93 @@
                         <select id="admin-product-category" required>
                             <option value="">Select Category</option>
                             <option value="ecs">Elastic Cloud Servers</option>
+                            <option value="evs">EVS Ultra Disk Space</option>
                             <option value="storage">Storage</option>
                             <option value="ManagedServices">Managed Services</option>
                             <option value="mysql">MySQL RDS Database Service</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="admin-product-price">Price ($)</label>
+                        <label for="admin-product-price">Price (RM)</label>
                         <input type="number" id="admin-product-price" step="0.01" min="0" required>
                     </div>
                     <div class="form-group">
                         <label for="admin-product-description">Description</label>
                         <input type="text" id="admin-product-description">
+                    </div>
+
+                    <div class="specs-section" id="specs-section" style="display: none;">
+                        <h3>Product Specifications</h3>
+                        
+                        <!-- ECS Specs -->
+                        <div id="ecs-specs" style="display: none;">
+                            <div class="two-columns">
+                                <div class="form-group">
+                                    <label for="ecs-vcpus">vCPUs</label>
+                                    <input type="number" id="ecs-vcpus" min="1" value="1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ecs-memory">Memory (GB)</label>
+                                    <input type="number" id="ecs-memory" step="0.1" min="0.5" value="0.5">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- EVS Specs -->
+                        <div id="evs-specs" style="display: none;">
+                            <div class="form-group">
+                                <label for="evs-capacity">Capacity (GB)</label>
+                                <input type="number" id="evs-capacity" min="1" value="50">
+                            </div>
+                        </div>
+                        
+                        <!-- Storage Specs -->
+                        <div id="storage-specs" style="display: none;">
+                            <div class="form-group">
+                                <label for="storage-type">Storage Type</label>
+                                <select id="storage-type">
+                                    <option value="block">Block Storage</option>
+                                    <option value="object">Object Storage</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="storage-capacity">Capacity (GB)</label>
+                                <input type="number" id="storage-capacity" min="1" value="100">
+                            </div>
+                        </div>
+                        
+                        <!-- Managed Services Specs -->
+                        <div id="managed-specs" style="display: none;">
+                            <div class="form-group">
+                                <label for="managed-level">Service Level</label>
+                                <select id="managed-level">
+                                    <option value="Basic Managed Service">Basic Managed Service</option>
+                                    <option value="Premium Managed Service">Premium Managed Service</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- MySQL Specs -->
+                        <div id="mysql-specs" style="display: none;">
+                            <div class="two-columns">
+                                <div class="form-group">
+                                    <label for="mysql-vcpus">vCPUs</label>
+                                    <input type="number" id="mysql-vcpus" min="1" value="2">
+                                </div>
+                                <div class="form-group">
+                                    <label for="mysql-ram">RAM (GB)</label>
+                                    <input type="number" id="mysql-ram" min="1" value="3">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="mysql-storage">Storage (GB)</label>
+                                <input type="number" id="mysql-storage" min="1" value="500">
+                            </div>
+                            <div class="form-group">
+                                <label for="mysql-edition">Edition</label>
+                                <input type="text" id="mysql-edition" value="HA Edition">
+                            </div>
+                        </div>
                     </div>
                     <div style="display: flex; gap: 1rem;">
                         <button type="button" class="btn btn-primary" id="save-product">Save</button>
@@ -471,17 +564,238 @@
     <script>
         // ========== GLOBAL VARIABLES ==========
         let products = JSON.parse(localStorage.getItem('products')) || [
-        { id: 1, name: "ECS virtual server with Linux, 4vCPU, 16GB Memory and 50GB System Disk", category: "ecs", price: 10093.00, description: "ECS virtual server with Linux, 4vCPU, 16GB Memory and 50GB System Disk" },
-        { id: 2, name: "ECS virtual server with Windows, 4vCPU, 16GB Memory and 50GB System Disk", category: "ecs", price: 14964.00, description: "ECS virtual server with Windows, 4vCPU, 16GB Memory and 50GB System Disk" },
-        { id: 3, name: "100GB Block Storage (Standard Disk)", category: "storage", price: 279.00, description: "100GB Block Storage (Standard Disk)" },
-        { id: 4, name: "100GB Object Storage", category: "storage", price: 80.00, description: "100GB Object Storage" },
-        { id: 5, name: "Basic Managed Service", category: "ManagedServices", price: 1328.00, description: "Basic managed services for 1 unit of virtual or physical server" },
-        { id: 6, name: "Premium Managed Service", category: "ManagedServices", price: 5625.00, description: "Premium managed services for 1 unit of virtual or physical server" },
-        { id: 7, name: "Basic mySQL HA Edition RDS with 2vCPU, 3GB RAM, 500GB SSD Storage", category: "mysql", price: 12885.00, description: "Basic mySQL HA Edition RDS with 2vCPU, 3GB RAM, 500GB SSD Storage" },
-        { id: 8, name: "Standard mySQL HA Edition RDS with 4vCPU, 16GB RAM, 500GB SSD Storage", category: "mysql", price: 18045.00, description: "Standard mySQL HA Edition RDS with 4vCPU, 16GB RAM, 500GB SSD Storage" },
-        { id: 9, name: "Premium mySQL HA Edition RDS with 8vCPU, 32GB RAM, 500GB SSD Storage", category: "mysql", price: 28459.00, description: "Premium mySQL HA Edition RDS with 8vCPU, 32GB RAM, 500GB SSD Storage" },
-        { id: 10, name: "Advance mySQL HA Edition RDS with 16vCPU, 64GB RAM, 500GB SSD Storage", category: "mysql", price: 58612.00, description: "Advance mySQL HA Edition RDS with 16vCPU, 64GB RAM, 500GB SSD Storage" }
-    ];
+            // Elastic Cloud Servers
+            { 
+                id: 'ecs-1', 
+                name: "IaaS ECS 2C4M", 
+                category: "ecs", 
+                price: 19.99, 
+                description: "Basic cloud server with 2 vCPUs and 4GB RAM",
+                specs: {
+                    vcpus: 2,
+                    memory: 4
+                }
+            },
+            { 
+                id: 'ecs-2', 
+                name: "IaaS ECS 2C8M", 
+                category: "ecs", 
+                price: 29.99, 
+                description: "Cloud server with 2 vCPUs and 8GB RAM",
+                specs: {
+                    vcpus: 2,
+                    memory: 8
+                }
+            },
+            { 
+                id: 'ecs-3', 
+                name: "IaaS ECS 4C8M", 
+                category: "ecs", 
+                price: 39.99, 
+                description: "Cloud server with 4 vCPUs and 8GB RAM",
+                specs: {
+                    vcpus: 4,
+                    memory: 8
+                }
+            },
+            { 
+                id: 'ecs-4', 
+                name: "IaaS ECS 4C16M", 
+                category: "ecs", 
+                price: 59.99, 
+                description: "Cloud server with 4 vCPUs and 16GB RAM",
+                specs: {
+                    vcpus: 4,
+                    memory: 16
+                }
+            },
+            { 
+                id: 'ecs-5', 
+                name: "IaaS ECS 8C16M", 
+                category: "ecs", 
+                price: 79.99, 
+                description: "High performance cloud server with 8 vCPUs and 16GB RAM",
+                specs: {
+                    vcpus: 8,
+                    memory: 16
+                }
+            },
+            { 
+                id: 'ecs-6', 
+                name: "IaaS ECS 8C32M", 
+                category: "ecs", 
+                price: 119.99, 
+                description: "High performance cloud server with 8 vCPUs and 32GB RAM",
+                specs: {
+                    vcpus: 8,
+                    memory: 32
+                }
+            },
+            { 
+                id: 'ecs-7', 
+                name: "IaaS ECS 16C32M", 
+                category: "ecs", 
+                price: 159.99, 
+                description: "Enterprise cloud server with 16 vCPUs and 32GB RAM",
+                specs: {
+                    vcpus: 16,
+                    memory: 32
+                }
+            },
+            { 
+                id: 'ecs-8', 
+                name: "IaaS ECS 16C64M", 
+                category: "ecs", 
+                price: 229.99, 
+                description: "Enterprise cloud server with 16 vCPUs and 64GB RAM",
+                specs: {
+                    vcpus: 16,
+                    memory: 64
+                }
+            },
+            
+            // EVS Ultra Disk Space
+            { 
+                id: 'evs-1', 
+                name: "EVS Ultra Disk 50GB", 
+                category: "evs", 
+                price: 5.00, 
+                description: "50GB Ultra Disk Storage",
+                specs: {
+                    capacity: 50
+                }
+            },
+            { 
+                id: 'evs-2', 
+                name: "EVS Ultra Disk 100GB", 
+                category: "evs", 
+                price: 8.00, 
+                description: "100GB Ultra Disk Storage",
+                specs: {
+                    capacity: 100
+                }
+            },
+            { 
+                id: 'evs-3', 
+                name: "EVS Ultra Disk 500GB", 
+                category: "evs", 
+                price: 30.00, 
+                description: "500GB Ultra Disk Storage",
+                specs: {
+                    capacity: 500
+                }
+            },
+            { 
+                id: 'evs-4', 
+                name: "EVS Ultra Disk 1000GB", 
+                category: "evs", 
+                price: 50.00, 
+                description: "1000GB (1TB) Ultra Disk Storage",
+                specs: {
+                    capacity: 1000
+                }
+            },
+            
+            // Storage
+            { 
+                id: 'storage-1', 
+                name: "Block Storage (Standard) 100GB", 
+                category: "storage", 
+                price: 2.79, 
+                description: "100GB Block Storage (Standard Disk)",
+                specs: {
+                    type: "block",
+                    capacity: 100
+                }
+            },
+            { 
+                id: 'storage-2', 
+                name: "Object Storage 100GB", 
+                category: "storage", 
+                price: 0.80, 
+                description: "100GB Object Storage",
+                specs: {
+                    type: "object",
+                    capacity: 100
+                }
+            },
+            
+            // Managed Services
+            {
+                id: 'managed-1',
+                name: "Basic Managed Service",
+                category: "ManagedServices",
+                price: 13.28,
+                description: "Basic support for 1 server (remote/physical)",
+                specs: {
+                    level: "Basic Managed Service"
+                }
+            },
+            {
+                id: 'managed-2',
+                name: "Premium Managed Service", 
+                category: "ManagedServices", 
+                price: 56.25,
+                description: "Advanced support for 1 server (OS/HW)",
+                specs: {
+                    level: "Premium Managed Service"
+                }
+            },
+
+            // MySQL RDS Products
+            { 
+                id: 'mysql-1', 
+                name: "Basic MySQL HA Edition RDS", 
+                category: "mysql", 
+                price: 12000.00, 
+                description: "Basic MySQL HA Edition RDS with 2vCPU, 8GB RAM, 500GB SSD Storage",
+                specs: {
+                    vcpus: 2,
+                    ram: 8,
+                    storage: 500,
+                    edition: "Basic"
+                }
+            },
+            { 
+                id: 'mysql-2', 
+                name: "Standard MySQL HA Edition RDS", 
+                category: "mysql", 
+                price: 18000.00, 
+                description: "Standard MySQL HA Edition RDS with 4 vCPU, 16GB RAM, 500GB SSD Storage",
+                specs: {
+                    vcpus: 4,
+                    ram: 16,
+                    storage: 500,
+                    edition: "Standard"
+                }
+            },
+            { 
+                id: 'mysql-3', 
+                name: "Premium MySQL HA Edition RDS", 
+                category: "mysql", 
+                price: 28000.00, 
+                description: "Premium MySQL HA Edition RDS with 8 vCPU, 32GB RAM, 500GB SSD Storage",
+                specs: {
+                    vcpus: 8,
+                    ram: 32,
+                    storage: 500,
+                    edition: "Premium"
+                }
+            },
+            { 
+                id: 'mysql-4', 
+                name: "Advance MySQL HA Edition RDS", 
+                category: "mysql", 
+                price: 58000.00, 
+                description: "Advance MySQL HA Edition RDS with 16 vCPU, 64GB RAM, 500GB SSD Storage",
+                specs: {
+                    vcpus: 16,
+                    ram: 64,
+                    storage: 500,
+                    edition: "Advance"
+                }
+            }
+        ];
         
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         const TAX_RATE = 0.08; // 8% tax rate
@@ -541,7 +855,7 @@
             filteredProducts.forEach(product => {
                 const option = document.createElement('option');
                 option.value = product.id;
-                option.textContent = `${product.name} - $${product.price.toFixed(2)}`;
+                option.textContent = `${product.name} - RM${product.price.toFixed(2)}`;
                 option.dataset.price = product.price;
                 productSelect.appendChild(option);
             });
@@ -555,15 +869,18 @@
             
             if (selectedOption && selectedOption.value) {
                 const price = parseFloat(selectedOption.dataset.price);
-                document.getElementById('product-price').textContent = `$${(price * quantity).toFixed(2)}`;
+                document.getElementById('product-price').textContent = `RM${(price * quantity).toFixed(2)}`;
             } else {
-                document.getElementById('product-price').textContent = '$0.00';
+                document.getElementById('product-price').textContent = 'RM0.00';
             }
         }
         
         function addToCart() {
             const productId = document.getElementById('product-select').value;
             const quantity = parseInt(document.getElementById('quantity').value);
+            const environment = document.getElementById('server-environment').value;
+            const envName = environment === 'dev' ? 'Dev' : 
+                          environment === 'prod' ? 'Prod' : 'DR';
             
             if (!productId) {
                 alert('Please select a product');
@@ -571,19 +888,20 @@
             }
             
             const selectedOption = document.getElementById('product-select').selectedOptions[0];
-            const productName = selectedOption.textContent.split(' - ')[0];
+            const productName = `${selectedOption.textContent.split(' - ')[0]} (${envName})`;
             const price = parseFloat(selectedOption.dataset.price);
             
-            const existingItem = cart.find(item => item.id === productId);
+            const existingItem = cart.find(item => item.id === `${productId}-${environment}`);
             
             if (existingItem) {
                 existingItem.quantity += quantity;
             } else {
                 cart.push({
-                    id: productId,
+                    id: `${productId}-${environment}`,
                     name: productName,
                     price: price,
-                    quantity: quantity
+                    quantity: quantity,
+                    environment: environment
                 });
             }
             
@@ -646,8 +964,8 @@
                     <div class="cart-item-details">
                         <div><strong>${item.name}</strong></div>
                         <div>Quantity: ${item.quantity}</div>
-                        <div>Price: $${item.price.toFixed(2)} each</div>
-                        <div><strong>Subtotal: $${itemTotal.toFixed(2)}</strong></div>
+                        <div>Price: RM${item.price.toFixed(2)} each</div>
+                        <div><strong>Subtotal: RM${itemTotal.toFixed(2)}</strong></div>
                     </div>
                     <div class="cart-item-actions">
                         <button class="delete-item" onclick="removeFromCart(${index})">×</button>
@@ -661,9 +979,9 @@
             const total = subtotal + tax;
             
             // Update summary
-            document.getElementById('cart-subtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('cart-tax').textContent = `$${tax.toFixed(2)}`;
-            document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('cart-subtotal').textContent = `RM${subtotal.toFixed(2)}`;
+            document.getElementById('cart-tax').textContent = `RM${tax.toFixed(2)}`;
+            document.getElementById('cart-total').textContent = `RM${total.toFixed(2)}`;
             
             // Show summary and actions
             cartSummaryContainer.style.display = 'block';
@@ -679,9 +997,9 @@
             
             if (cart.length === 0) {
                 orderItemsContainer.innerHTML = '<p>No items in cart</p>';
-                document.getElementById('order-subtotal').textContent = '$0.00';
-                document.getElementById('order-tax').textContent = '$0.00';
-                document.getElementById('order-total').textContent = '$0.00';
+                document.getElementById('order-subtotal').textContent = 'RM0.00';
+                document.getElementById('order-tax').textContent = 'RM0.00';
+                document.getElementById('order-total').textContent = 'RM0.00';
                 return;
             }
             
@@ -695,7 +1013,7 @@
                 orderItem.className = 'order-item';
                 orderItem.innerHTML = `
                     <div>${item.name} (${item.quantity})</div>
-                    <div>$${itemTotal.toFixed(2)}</div>
+                    <div>RM${itemTotal.toFixed(2)}</div>
                 `;
                 orderItemsContainer.appendChild(orderItem);
             });
@@ -705,9 +1023,9 @@
             const total = subtotal + tax;
             
             // Update summary
-            document.getElementById('order-subtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('order-tax').textContent = `$${tax.toFixed(2)}`;
-            document.getElementById('order-total').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('order-subtotal').textContent = `RM${subtotal.toFixed(2)}`;
+            document.getElementById('order-tax').textContent = `RM${tax.toFixed(2)}`;
+            document.getElementById('order-total').textContent = `RM${total.toFixed(2)}`;
         }
         
         function validateForm() {
@@ -740,12 +1058,12 @@
                     <td>${product.id}</td>
                     <td>${product.name}</td>
                     <td>${product.category}</td>
-                    <td>$${product.price.toFixed(2)}</td>
+                    <td>RM${product.price.toFixed(2)}</td>
                     <td>
                         <button class="action-btn" style="background: #3498db; color: white;" 
-                            onclick="editProduct(${product.id})">Edit</button>
+                            onclick="editProduct('${product.id}')">Edit</button>
                         <button class="action-btn" style="background: #e74c3c; color: white;" 
-                            onclick="deleteProduct(${product.id})">Delete</button>
+                            onclick="deleteProduct('${product.id}')">Delete</button>
                     </td>
                 `;
                 productsList.appendChild(tr);
@@ -770,13 +1088,31 @@
             document.getElementById('admin-product-price').value = product.price;
             document.getElementById('admin-product-description').value = product.description || '';
             
+            // Populate specs
+            if (product.category === 'ecs' && product.specs) {
+                document.getElementById('ecs-vcpus').value = product.specs.vcpus || 1;
+                document.getElementById('ecs-memory').value = product.specs.memory || 0.5;
+            } else if (product.category === 'evs' && product.specs) {
+                document.getElementById('evs-capacity').value = product.specs.capacity || 50;
+            } else if (product.category === 'storage' && product.specs) {
+                document.getElementById('storage-type').value = product.specs.type || 'block';
+                document.getElementById('storage-capacity').value = product.specs.capacity || 100;
+            } else if (product.category === 'ManagedServices' && product.specs) {
+                document.getElementById('managed-level').value = product.specs.level || 'Basic Managed Service';
+            } else if (product.category === 'mysql' && product.specs) {
+                document.getElementById('mysql-vcpus').value = product.specs.vcpus || 2;
+                document.getElementById('mysql-ram').value = product.specs.ram || 3;
+                document.getElementById('mysql-storage').value = product.specs.storage || 500;
+                document.getElementById('mysql-edition').value = product.specs.edition || 'HA Edition';
+            }
+            
+            updateSpecsForm();
             document.getElementById('product-form').style.display = 'block';
         }
         
         function saveProduct() {
-            const id = document.getElementById('product-id').value ? 
-                parseInt(document.getElementById('product-id').value) : 
-                Math.max(...products.map(p => p.id), 0) + 1;
+            const id = document.getElementById('product-id').value || 
+                      `${document.getElementById('admin-product-category').value.toLowerCase()}-${products.length + 1}`;
                 
             const name = document.getElementById('admin-product-name').value;
             const category = document.getElementById('admin-product-category').value;
@@ -788,23 +1124,50 @@
                 return;
             }
             
-            const product = { id, name, category, price, description };
+            // Handle specs based on category
+            let specs = {};
+            if (category === 'ecs') {
+                specs = {
+                    vcpus: parseInt(document.getElementById('ecs-vcpus').value),
+                    memory: parseFloat(document.getElementById('ecs-memory').value)
+                };
+            } else if (category === 'evs') {
+                specs = {
+                    capacity: parseInt(document.getElementById('evs-capacity').value)
+                };
+            } else if (category === 'storage') {
+                specs = {
+                    type: document.getElementById('storage-type').value,
+                    capacity: parseInt(document.getElementById('storage-capacity').value)
+                };
+            } else if (category === 'ManagedServices') {
+                specs = {
+                    level: document.getElementById('managed-level').value
+                };
+            } else if (category === 'mysql') {
+                specs = {
+                    vcpus: parseInt(document.getElementById('mysql-vcpus').value),
+                    ram: parseInt(document.getElementById('mysql-ram').value),
+                    storage: parseInt(document.getElementById('mysql-storage').value),
+                    edition: document.getElementById('mysql-edition').value
+                };
+            }
+            
+            const product = { id, name, category, price, description, specs };
             
             if (document.getElementById('product-id').value) {
-                // Update existing product
                 const index = products.findIndex(p => p.id === id);
                 if (index !== -1) {
                     products[index] = product;
                 }
             } else {
-                // Add new product
                 products.push(product);
             }
             
             localStorage.setItem('products', JSON.stringify(products));
             renderProducts();
             hideForm();
-            loadProducts(); // Refresh product list in order tab
+            loadProducts();
         }
         
         function deleteProduct(id) {
@@ -819,6 +1182,45 @@
         function hideForm() {
             document.getElementById('product-form').style.display = 'none';
         }
+
+        function updateSpecsForm() {
+            const category = document.getElementById('admin-product-category').value;
+            const specsSection = document.getElementById('specs-section');
+            const ecsSpecs = document.getElementById('ecs-specs');
+            const evsSpecs = document.getElementById('evs-specs');
+            const storageSpecs = document.getElementById('storage-specs');
+            const managedSpecs = document.getElementById('managed-specs');
+            const mysqlSpecs = document.getElementById('mysql-specs');
+            
+            // Hide all first
+            specsSection.style.display = 'none';
+            ecsSpecs.style.display = 'none';
+            evsSpecs.style.display = 'none';
+            storageSpecs.style.display = 'none';
+            managedSpecs.style.display = 'none';
+            mysqlSpecs.style.display = 'none';
+            
+            // Show relevant sections
+            if (category === 'ecs') {
+                specsSection.style.display = 'block';
+                ecsSpecs.style.display = 'block';
+            } else if (category === 'evs') {
+                specsSection.style.display = 'block';
+                evsSpecs.style.display = 'block';
+            } else if (category === 'storage') {
+                specsSection.style.display = 'block';
+                storageSpecs.style.display = 'block';
+            } else if (category === 'ManagedServices') {
+                specsSection.style.display = 'block';
+                managedSpecs.style.display = 'block';
+            } else if (category === 'mysql') {
+                specsSection.style.display = 'block';
+                mysqlSpecs.style.display = 'block';
+            }
+        }
+
+        // Add event listener to category dropdown
+        document.getElementById('admin-product-category').addEventListener('change', updateSpecsForm);
         
         // ========== EVENT LISTENERS ==========
         document.addEventListener('DOMContentLoaded', function() {
