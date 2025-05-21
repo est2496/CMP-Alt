@@ -1,8 +1,9 @@
 <!-- 
   Original Author: Calvin
   Edited by: Estella
-  Modified Date: 2025-05-14
+  Modified Date: 2025-05-21
   Description: This is the main HTML page version 2 for the website of CMP service catalog
+  Filename: main10_210525_Calvin_Estella_v2
 -->
 
 <!DOCTYPE html>
@@ -260,9 +261,8 @@
             <div class="environment-selector" style="width: 800px;">
                 <label for="server-environment">Server Environment:</label>
                 <select id="server-environment" style="width: 100%;">
-                    <option value="dev">Development</option>
-                    <option value="prod">Production</option>
-                    <option value="dr">Disaster Recovery</option>
+                    <option value="az1">Availability Zone1 (AZ1)</option>
+                    <option value="az2">Availability Zone2 (AZ2)</option>
                 </select>
             </div>
 
@@ -879,8 +879,7 @@
             const productId = document.getElementById('product-select').value;
             const quantity = parseInt(document.getElementById('quantity').value);
             const environment = document.getElementById('server-environment').value;
-            const envName = environment === 'dev' ? 'Dev' : 
-                          environment === 'prod' ? 'Prod' : 'DR';
+            const envName = environment === 'az1' ? 'AZ1' : 'AZ2';
             
             if (!productId) {
                 alert('Please select a product');
